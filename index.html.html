@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>정답 입력 사이트</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      margin-top: 50px; 
+      background: #f0f8ff;
+    }
+    img { max-width: 500px; height: auto; margin-bottom: 20px; }
+    input { padding: 10px; font-size: 16px; }
+    button { padding: 10px 18px; font-size: 16px; margin-left: 8px; }
+    p { margin-top: 20px; font-weight: bold; color: red; }
+    .text { font-size: 18px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- 컨테이너 -->
+  <div id="container">
+
+    <!-- 메인 페이지 -->
+    <div id="mainPage">
+      <img src="static/cctv.png" alt="메인 이미지">
+
+      <div class="text">
+        비밀번호를 입력하십시오<br><br>
+      </div>
+
+      <input type="text" id="answer" placeholder="정답 입력">
+      <button onclick="checkAnswer()">제출</button>
+      <p id="message"></p>
+    </div>
+
+    <!-- 다음 페이지 -->
+    <div id="nextPage" style="display:none;">
+      <img src="static/cctvdisplay.jpg" alt="다음 화면 이미지">
+    </div>
+
+  </div>
+
+  <script>
+    const correctAnswer = "watch";
+    const messages = [
+      "다시 도전해보자구요",
+      "오...쉽지 않군요",
+      "아직도 도전중이세요??",
+      "끈기 인정합니다."
+    ];
+
+    function checkAnswer() {
+      const userAnswer = document.getElementById('answer').value.trim();
+      const messageElem = document.getElementById('message');
+
+      if(userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+        // 메인 페이지 숨기고 다음 페이지 보여주기
+        document.getElementById('mainPage').style.display = 'none';
+        document.getElementById('nextPage').style.display = 'block';
+      } else {
+        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+        messageElem.textContent = randomMsg;
+      }
+    }
+  </script>
+
+</body>
+</html>
