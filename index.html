@@ -167,7 +167,7 @@
     form.addEventListener('submit', (e)=>{
       e.preventDefault();
       const v = (codeI.value || '').trim();
-      if (v === ACCESS_CODE) {
+      if (v.toLowerCase() === ACCESS_CODE.toLowerCase()) {
         showMenu();
       } else {
         err.textContent = '접근코드가 올바르지 않습니다.';
