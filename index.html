@@ -1,70 +1,193 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>정답 입력 사이트</title>
-  <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      margin-top: 50px; 
-      background: #f0f8ff;
-    }
-    img { max-width: 500px; height: auto; margin-bottom: 20px; }
-    input { padding: 10px; font-size: 16px; }
-    button { padding: 10px 18px; font-size: 16px; margin-left: 8px; }
-    p { margin-top: 20px; font-weight: bold; color: red; }
-    .text { font-size: 18px; margin-bottom: 20px; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CCTV 확인</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;color:#111;}
+  body{font-family:system-ui,"Noto Sans KR",sans-serif;}
+  .wrap{max-width:900px;margin:0 auto;padding:16px;}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+  .section{padding:18px 16px;text-align:center}
+  .title{margin:6px 0 8px;font-size:22px;font-weight:800}
+  .subtitle{margin:0 0 14px;color:#444}
+  .error{color:#dc2626;margin-top:10px;font-weight:700;min-height:1.2em}
+  .hero{display:flex;justify-content:center;align-items:center;padding:8px 12px;background:#fff}
+  .hero img{display:block;width:100%;max-width:560px;height:auto;border-radius:12px}
+  .input-row{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .input-row input{
+    flex:1 1 280px;max-width:420px;padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:12px;font-size:16px
+  }
+  .btn{
+    display:inline-block;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:800;
+    background:#F5A623;color:#111;border:1.5px solid #000;box-shadow:0 1px 0 rgba(0,0,0,.35) inset;transition:.06s;cursor:pointer
+  }
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+  .btn:active{transform:translateY(0);filter:brightness(.98)}
+
+  /* 시간 버튼 리스트 */
+  .list{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+  .list .item{
+    display:block;width:100%;text-align:center;padding:14px 12px;border-radius:12px;
+    border:1px solid #e5e7eb;background:#fff;font-weight:900;text-decoration:none;color:#111;
+    box-shadow:0 6px 16px rgba(0,0,0,.06); cursor:pointer;
+  }
+  .list .item:hover{background:#fafafa}
+
+  /* 동영상 화면(검은 배경) */
+  .video-wrap{background:#000; padding:18px 12px;}
+  .video-title{color:#fff; text-align:center; font-weight:900; margin:0 0 10px;}
+  .player{max-width:900px;margin:0 auto}
+  video{width:100%;height:auto;background:#000}
+
+  /* 숨김 제어 */
+  [hidden]{display:none !important}
+
+  @media (max-width:480px){ .wrap{padding:12px} .title{font-size:20px} }
+</style>
 </head>
 <body>
+  <main class="wrap">
+    <div class="card">
+      <!-- 1) 접근코드 입력 화면 -->
+      <section id="page-access" class="section">
+        <h1 class="title">CCTV 확인 시 접근코드 입력 바람</h1>
+        <p class="subtitle">-관계자 외 출입금지-</p>
 
-  <!-- 컨테이너 -->
-  <div id="container">
+        <div class="hero">
+          <img src="static/window.png" alt="접근코드 가이드 이미지">
+        </div>
 
-    <!-- 메인 페이지 -->
-    <div id="mainPage">
-      <img src="static/cctv.png" alt="메인 이미지">
+        <form id="access-form" class="input-row" autocomplete="off">
+          <input id="code" type="text" placeholder="접근코드" required />
+          <button class="btn" type="submit">확인</button>
+        </form>
+        <div id="error" class="error"></div>
+      </section>
 
-      <div class="text">
-        비밀번호를 입력하십시오<br><br>
-      </div>
+      <!-- 2) 시간 선택 화면 -->
+      <section id="page-menu" class="section" hidden>
+        <h2 class="title">CCTV 기록 선택</h2>
+        <p class="subtitle">4444-12-14의 CCTV 기록입니다. 확인할 시간을 선택하세요.</p>
 
-      <input type="text" id="answer" placeholder="정답 입력">
-      <button onclick="checkAnswer()">제출</button>
-      <p id="message"></p>
+        <div class="list">
+          <button class="item" data-video="5pm">
+            4444-12-14<br>17:00:00
+          </button>
+          <button class="item" data-video="6pm">
+            4444-12-14<br>18:00:00
+          </button>
+          <button class="item" data-video="7pm">
+            4444-12-14<br>19:00:00
+          </button>
+          <button class="item" data-video="8pm">
+            4444-12-14<br>20:00:00
+          </button>
+        </div>
+
+        <div style="margin-top:14px;">
+          <button class="btn" id="back-to-access" type="button">접근코드 다시 입력</button>
+        </div>
+      </section>
+
+      <!-- 3) 동영상 재생 화면 -->
+      <section id="page-video" class="video-wrap" hidden>
+        <h2 id="video-title" class="video-title">CCTV 재생</h2>
+        <div class="player">
+          <video id="player" controls playsinline preload="metadata">
+            <!-- 소스는 JS에서 설정 -->
+          </video>
+        </div>
+        <div style="text-align:center;margin:12px 0 6px;">
+          <button class="btn" id="back-to-menu" type="button">다른 시간 보기</button>
+        </div>
+      </section>
     </div>
-
-    <!-- 다음 페이지 -->
-    <div id="nextPage" style="display:none;">
-      <img src="static/cctvdisplay.jpg" alt="다음 화면 이미지">
-    </div>
-
-  </div>
+  </main>
 
   <script>
-    const correctAnswer = "watch";
-    const messages = [
-      "다시 도전해보자구요",
-      "오...쉽지 않군요",
-      "아직도 도전중이세요??",
-      "끈기 인정합니다."
-    ];
+    // ====== 설정 ======
+    const ACCESS_CODE = "video"; // ← 접근코드(여기만 바꾸면 됨)
 
-    function checkAnswer() {
-      const userAnswer = document.getElementById('answer').value.trim();
-      const messageElem = document.getElementById('message');
+    // ====== 엘리먼트 ======
+    const pAccess = document.getElementById('page-access');
+    const pMenu   = document.getElementById('page-menu');
+    const pVideo  = document.getElementById('page-video');
 
-      if(userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
-        // 메인 페이지 숨기고 다음 페이지 보여주기
-        document.getElementById('mainPage').style.display = 'none';
-        document.getElementById('nextPage').style.display = 'block';
-      } else {
-        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-        messageElem.textContent = randomMsg;
-      }
+    const form  = document.getElementById('access-form');
+    const codeI = document.getElementById('code');
+    const err   = document.getElementById('error');
+
+    const backToAccess = document.getElementById('back-to-access');
+    const backToMenu   = document.getElementById('back-to-menu');
+
+    const videoTitle = document.getElementById('video-title');
+    const player     = document.getElementById('player');
+
+    // ====== 라우팅 유틸 ======
+    function showAccess(){
+      pAccess.hidden = false;
+      pMenu.hidden   = true;
+      pVideo.hidden  = true;
+      err.textContent = '';
+      codeI.focus();
+      window.scrollTo({top:0, behavior:'instant'});
     }
-  </script>
+    function showMenu(){
+      pAccess.hidden = true;
+      pMenu.hidden   = false;
+      pVideo.hidden  = true;
+      window.scrollTo({top:0, behavior:'instant'});
+    }
+    function showVideo(label){
+      // label: '5pm' | '6pm' | '7pm' | '8pm'
+      pAccess.hidden = true;
+      pMenu.hidden   = true;
+      pVideo.hidden  = false;
 
+      const map = {
+        '5pm': { title: '4444-12-14 17:00:00', src: 'static/5pm.mp4' },
+        '6pm': { title: '4444-12-14 18:00:00', src: 'static/6pm.mp4' },
+        '7pm': { title: '4444-12-14 19:00:00', src: 'static/7pm.mp4' },
+        '8pm': { title: '4444-12-14 20:00:00', src: 'static/8pm.mp4' }
+      };
+      const info = map[label];
+      videoTitle.textContent = `CCTV 재생 — ${info.title}`;
+
+      // 비디오 소스 교체
+      player.pause();
+      player.src = info.src;
+      player.load();
+      // iOS 자동재생 막힘 대비: 사용자가 플레이 버튼 누르면 재생됨
+      window.scrollTo({top:0, behavior:'instant'});
+    }
+
+    // ====== 이벤트 ======
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const v = (codeI.value || '').trim();
+      if (v === ACCESS_CODE) {
+        showMenu();
+      } else {
+        err.textContent = '접근코드가 올바르지 않습니다.';
+      }
+    });
+
+    backToAccess.addEventListener('click', showAccess);
+    backToMenu.addEventListener('click', showMenu);
+
+    // 시간 버튼 위임
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.item');
+      if (!btn) return;
+      const label = btn.getAttribute('data-video');
+      if (!label) return;
+      showVideo(label);
+    });
+
+    // 초기 포커스
+    window.addEventListener('load', ()=> codeI.focus());
+  </script>
 </body>
 </html>
